@@ -76,6 +76,7 @@ public class EditPane extends JPanel implements Observer {
 
     public EditPane(VenusUI appFrame) {
         super(new BorderLayout());
+        this.setMinimumSize(new Dimension(0,0));
         this.mainUI = appFrame;
         // user.dir, user's current working directory, is guaranteed to have a value
         currentDirectoryPath = System.getProperty("user.dir");
