@@ -170,7 +170,7 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
         table.getColumnModel().getColumn(BASIC_COLUMN).setCellRenderer(codeStepHighlighter);
         table.getColumnModel().getColumn(SOURCE_COLUMN).setCellRenderer(codeStepHighlighter);
         // to render String right-justified in mono font
-        table.getColumnModel().getColumn(ADDRESS_COLUMN).setCellRenderer(new MonoCenterRender());
+        table.getColumnModel().getColumn(ADDRESS_COLUMN).setCellRenderer(new MonoCenterRenderer());
         table.getColumnModel().getColumn(CODE_COLUMN).setCellRenderer(new MachineCodeCellRenderer());
         table.getColumnModel().getColumn(BREAK_COLUMN).setCellRenderer(new CheckBoxTableCellRenderer());
         reorderColumns(); // Re-order columns according to current preference...
@@ -876,7 +876,7 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
     /**
      * Cell renderer for Address column.  Same as MonoRightCellRenderer except centered.
      */
-    static class MonoCenterRender extends MonoRightCellRenderer {
+    static class MonoCenterRenderer extends MonoRightCellRenderer {
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus, int row, int column) {
             Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
