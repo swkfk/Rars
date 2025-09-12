@@ -11,6 +11,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.*;
@@ -80,6 +82,7 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
     private static final int CODE_COLUMN = 2;
     private static final int BASIC_COLUMN = 3;
     private static final int SOURCE_COLUMN = 4;
+    private static final int[] FRACTIONAL_WIDTH = {1, 4, 4, 10, 20};
 
     private static final Font monospacedPlain12Point = new Font("Monospaced", Font.PLAIN, 12);
     // The following is displayed in the Basic and Source columns if existing code is overwritten using self-modifying code feature
@@ -163,17 +166,11 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
         // prevents cells in row from being highlighted when user clicks on breakpoint checkbox
         table.setRowSelectionAllowed(false);
 
-        table.getColumnModel().getColumn(BREAK_COLUMN).setPreferredWidth(40);
-        table.getColumnModel().getColumn(ADDRESS_COLUMN).setPreferredWidth(80);
-        table.getColumnModel().getColumn(CODE_COLUMN).setPreferredWidth(80);
-        table.getColumnModel().getColumn(BASIC_COLUMN).setPreferredWidth(160);
-        table.getColumnModel().getColumn(SOURCE_COLUMN).setPreferredWidth(280);
-
         CodeCellRenderer codeStepHighlighter = new CodeCellRenderer();
         table.getColumnModel().getColumn(BASIC_COLUMN).setCellRenderer(codeStepHighlighter);
         table.getColumnModel().getColumn(SOURCE_COLUMN).setCellRenderer(codeStepHighlighter);
         // to render String right-justified in mono font
-        table.getColumnModel().getColumn(ADDRESS_COLUMN).setCellRenderer(new MonoRightCellRenderer());
+        table.getColumnModel().getColumn(ADDRESS_COLUMN).setCellRenderer(new MonoCenterRender());
         table.getColumnModel().getColumn(CODE_COLUMN).setCellRenderer(new MachineCodeCellRenderer());
         table.getColumnModel().getColumn(BREAK_COLUMN).setCellRenderer(new CheckBoxTableCellRenderer());
         reorderColumns(); // Re-order columns according to current preference...
@@ -191,6 +188,25 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
         if (Globals.getSettings().getBooleanSetting(Settings.Bool.SELF_MODIFYING_CODE_ENABLED)) {
             addAsTextSegmentObserver();
         }
+
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
+        tableScroller.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int tW = table.getWidth();
+                TableColumnModel jTableColumnModel = table.getColumnModel();
+                int cantCols = jTableColumnModel.getColumnCount();
+                int totalFraction = 0;
+                for (int fr : FRACTIONAL_WIDTH) {
+                    totalFraction += fr;
+                }
+                for (int i = 0; i < cantCols; i++) {
+                    TableColumn column = jTableColumnModel.getColumn(i);
+                    int pWidth = FRACTIONAL_WIDTH[i] * tW / totalFraction;
+                    column.setPreferredWidth(Math.max(1, pWidth - 1));
+                }
+            }
+        });
     }
 
     ////////////  Support for program arguments added DPS 17-July-2008 //////////////
@@ -839,13 +855,13 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
     * Cell renderer for Machine Code column.  Alternates background color by row but otherwise is
     * same as MonoRightCellRenderer.
     */
-    class MachineCodeCellRenderer extends DefaultTableCellRenderer {
+    static class MachineCodeCellRenderer extends DefaultTableCellRenderer {
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus, int row, int column) {
             JLabel cell = (JLabel) super.getTableCellRendererComponent(table, value,
                     isSelected, hasFocus, row, column);
             cell.setFont(MonoRightCellRenderer.MONOSPACED_PLAIN_12POINT);
-            cell.setHorizontalAlignment(SwingConstants.RIGHT);
+            cell.setHorizontalAlignment(SwingConstants.CENTER);
             if (row % 2 == 0) {
                 cell.setBackground(Globals.getSettings().getColorSettingByPosition(Settings.EVEN_ROW_BACKGROUND));
                 cell.setForeground(Globals.getSettings().getColorSettingByPosition(Settings.EVEN_ROW_FOREGROUND));
@@ -853,6 +869,18 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
                 cell.setBackground(Globals.getSettings().getColorSettingByPosition(Settings.ODD_ROW_BACKGROUND));
                 cell.setForeground(Globals.getSettings().getColorSettingByPosition(Settings.ODD_ROW_FOREGROUND));
             }
+            return cell;
+        }
+    }
+
+    /**
+     * Cell renderer for Address column.  Same as MonoRightCellRenderer except centered.
+     */
+    static class MonoCenterRender extends MonoRightCellRenderer {
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+            Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            ((JLabel) cell).setHorizontalAlignment(SwingConstants.CENTER);
             return cell;
         }
     }
