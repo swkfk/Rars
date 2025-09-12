@@ -82,7 +82,7 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
     private static final int CODE_COLUMN = 2;
     private static final int BASIC_COLUMN = 3;
     private static final int SOURCE_COLUMN = 4;
-    private static final int[] FRACTIONAL_WIDTH = {1, 4, 4, 10, 20};
+    private static final double[] columnWidthFraction = {1, 4, 4, 10, 20};
 
     private static final Font monospacedPlain12Point = new Font("Monospaced", Font.PLAIN, 12);
     // The following is displayed in the Basic and Source columns if existing code is overwritten using self-modifying code feature
@@ -196,13 +196,13 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
                 int tW = table.getWidth();
                 TableColumnModel jTableColumnModel = table.getColumnModel();
                 int cantCols = jTableColumnModel.getColumnCount();
-                int totalFraction = 0;
-                for (int fr : FRACTIONAL_WIDTH) {
+                double totalFraction = 0;
+                for (double fr : columnWidthFraction) {
                     totalFraction += fr;
                 }
                 for (int i = 0; i < cantCols; i++) {
                     TableColumn column = jTableColumnModel.getColumn(i);
-                    int pWidth = FRACTIONAL_WIDTH[i] * tW / totalFraction;
+                    int pWidth = (int) (columnWidthFraction[i] * tW / totalFraction);
                     column.setPreferredWidth(Math.max(1, pWidth - 1));
                 }
             }
@@ -1094,6 +1094,14 @@ public class TextSegmentWindow extends JInternalFrame implements Observer {
         }
 
         public void columnMarginChanged(ChangeEvent e) {
+            if (table.getTableHeader().getResizingColumn() == null)
+                return;
+            int tW = table.getWidth();
+            int count = table.getColumnCount();
+            for (int i = 0; i < count; i++) {
+                int colWidth = table.getColumnModel().getColumn(i).getWidth();
+                columnWidthFraction[i] = (double) colWidth / (double) tW;
+            }
         }
 
         public void columnSelectionChanged(ListSelectionEvent e) {
