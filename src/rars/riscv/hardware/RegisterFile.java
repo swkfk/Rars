@@ -4,7 +4,9 @@ import rars.Globals;
 import rars.Settings;
 import rars.assembler.SymbolTable;
 import rars.riscv.Instruction;
+import rars.util.SystemIO;
 
+import java.util.HashSet;
 import java.util.Observer;
 
 /*
@@ -67,6 +69,13 @@ public class RegisterFile {
     });
 
     private static Register programCounter = new Register("pc", -1, Memory.textBaseAddress);
+    private static HashSet<Integer> selfBranchPc = new HashSet<>();
+
+    public static boolean hasSelfBranchedOrAdd(int pc) {
+        boolean result = selfBranchPc.contains(pc);
+        selfBranchPc.add(pc);
+        return result;
+    }
 
     /**
      * This method updates the register value who's number is num.  Also handles the lo and hi registers
@@ -83,6 +92,10 @@ public class RegisterFile {
                 Globals.program.getBackStepper().addRegisterFileRestore(num, instance.updateRegister(num, val));
             } else {
                 instance.updateRegister(num, val);
+            }
+            if (num < 32 && Globals.getSettings().getBooleanSetting(Settings.Bool.OUTPUT_CO_LOGS)) {
+                String line = String.format("@%08x: $%2d <= %08x\n", RegisterFile.getProgramCounter() - 4, num, val);
+                SystemIO.printString(line);
             }
         }
     }
@@ -246,6 +259,7 @@ public class RegisterFile {
     public static void resetRegisters() {
         instance.resetRegisters();
         initializeProgramCounter(Globals.getSettings().getBooleanSetting(Settings.Bool.START_AT_MAIN));// replaces "programCounter.resetValue()", DPS 3/3/09
+        selfBranchPc.clear();
     }
 
     /**

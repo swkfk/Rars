@@ -113,6 +113,8 @@ public class Launch {
     private boolean gui;
     private boolean simulate;
     private boolean rv64;
+    private boolean outputLog;
+    private boolean outputLogPC;
     private int displayFormat;
     private boolean verbose;  // display register name or address along with contents
     private boolean assembleProject; // assemble only the given file or all files in its directory
@@ -290,6 +292,15 @@ public class Launch {
             if (args[i].toLowerCase().equals(noCopyrightSwitch)) {
                 continue;
             }
+            // output logs
+            if (args[i].toLowerCase().equals("lg")) {
+                outputLog = true;
+                continue;
+            }
+            if (args[i].toLowerCase().equals("lgpc")) {
+                outputLogPC = true;
+                continue;
+            }
             if (args[i].toLowerCase().equals("dump")) {
                 if (args.length <= (i + 3)) {
                     out.println("Dump command line argument requires a segment, format and file name.");
@@ -454,6 +465,8 @@ public class Launch {
         }
 
         Globals.getSettings().setBooleanSettingNonPersistent(Settings.Bool.RV64_ENABLED,rv64);
+        Globals.getSettings().setBooleanSettingNonPersistent(Settings.Bool.OUTPUT_CO_LOGS, outputLog);
+        Globals.getSettings().setBooleanSettingNonPersistent(Settings.Bool.OUTPUT_CO_LOGS_PC, outputLogPC);
         InstructionSet.rv64 = rv64;
         Globals.instructionSet.populate();
 
@@ -757,6 +770,8 @@ public class Launch {
         out.println("            option must be placed AFTER ALL FILE NAMES, because everything");
         out.println("            that follows it is interpreted as a program argument to be");
         out.println("            made available to the program at runtime.");
+        out.println("     lg  -- output logs when registers or memories are modified.");
+        out.println("   lgpc  -- output logs at branching or jumping. Self-branch with the same PC will be printed once.");
         out.println("If more than one filename is listed, the first is assumed to be the main");
         out.println("unless the global statement label 'main' is defined in one of the files.");
         out.println("Exception handler not automatically assembled.  Add it to the file list.");
