@@ -770,6 +770,8 @@ public class Launch {
         out.println("            option must be placed AFTER ALL FILE NAMES, because everything");
         out.println("            that follows it is interpreted as a program argument to be");
         out.println("            made available to the program at runtime.");
+        out.println("     lg  -- output logs when registers or memories are modified.");
+        out.println("   lgpc  -- output logs at branching or jumping. Self-branch with the same PC will be printed once.");
         out.println("If more than one filename is listed, the first is assumed to be the main");
         out.println("unless the global statement label 'main' is defined in one of the files.");
         out.println("Exception handler not automatically assembled.  Add it to the file list.");
