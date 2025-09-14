@@ -6,6 +6,7 @@ import rars.Settings;
 import rars.SimulationException;
 import rars.riscv.Instruction;
 import rars.util.Binary;
+import rars.util.SystemIO;
 
 import java.util.Collection;
 import java.util.Observable;
@@ -426,6 +427,12 @@ public class Memory extends Observable {
                     SimulationException.STORE_ACCESS_FAULT, address);
         }
         notifyAnyObservers(AccessNotice.WRITE, address, length, value);
+        if (Globals.getSettings().getBooleanSetting(Settings.Bool.OUTPUT_CO_LOGS)) {
+            int newAddress = address & ~3;
+            int newWord = getWord(newAddress);
+            String line = String.format("@%08x: *%08x <= %08x\n", RegisterFile.getProgramCounter() - 4,newAddress, newWord);
+            SystemIO.printString(line);
+        }
         return oldValue;
     }
 

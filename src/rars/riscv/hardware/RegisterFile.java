@@ -4,6 +4,7 @@ import rars.Globals;
 import rars.Settings;
 import rars.assembler.SymbolTable;
 import rars.riscv.Instruction;
+import rars.util.SystemIO;
 
 import java.util.Observer;
 
@@ -83,6 +84,10 @@ public class RegisterFile {
                 Globals.program.getBackStepper().addRegisterFileRestore(num, instance.updateRegister(num, val));
             } else {
                 instance.updateRegister(num, val);
+            }
+            if (num < 32 && Globals.getSettings().getBooleanSetting(Settings.Bool.OUTPUT_CO_LOGS)) {
+                String line = String.format("@%08x: $%2d <= %08x\n", RegisterFile.getProgramCounter() - 4, num, val);
+                SystemIO.printString(line);
             }
         }
     }
