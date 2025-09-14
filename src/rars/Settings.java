@@ -162,7 +162,9 @@ public class Settings extends Observable {
         /**
          * Flag to determine whether to output logs used in CO Course.
          */
-        OUTPUT_CO_LOGS("OutputCOLogs", false);
+        OUTPUT_CO_LOGS("OutputCOLogs", false),
+        OUTPUT_CO_LOGS_PC("OutputCOLogsPC", false),
+        ;
 
         // TODO: add option for turning off user trap handling and interrupts
         private String name;

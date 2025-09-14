@@ -308,7 +308,20 @@ public class InstructionSet {
 
     public static void processBranch(int displacement) {
         // Decrement needed because PC has already been incremented
-        RegisterFile.setProgramCounter(RegisterFile.getProgramCounter() + displacement - Instruction.INSTRUCTION_LENGTH);
+        int targetPC = RegisterFile.getProgramCounter() + displacement - Instruction.INSTRUCTION_LENGTH;
+        if (Globals.getSettings().getBooleanSetting(Settings.Bool.OUTPUT_CO_LOGS_PC)) {
+            int oldPC = RegisterFile.getProgramCounter() - Instruction.INSTRUCTION_LENGTH;
+            if (oldPC != targetPC) {
+                String line = String.format("@%08x: Branching to %08x\n", oldPC, targetPC);
+                SystemIO.printString(line);
+            } else {
+                if (!RegisterFile.hasSelfBranchedOrAdd(oldPC)) {
+                    String line = String.format("@%08x: Branching to self. Similar behaviors in the future will be ignored.\n", oldPC);
+                    SystemIO.printString(line);
+                }
+            }
+        }
+        RegisterFile.setProgramCounter(targetPC);
     }
 
    	/*
@@ -320,6 +333,11 @@ public class InstructionSet {
    	 */
 
     public static void processJump(int targetAddress) {
+        if (Globals.getSettings().getBooleanSetting(Settings.Bool.OUTPUT_CO_LOGS_PC)) {
+            int oldPC = RegisterFile.getProgramCounter() - Instruction.INSTRUCTION_LENGTH;
+            String line = String.format("@%08x: Jumping to %08x\n", oldPC, targetAddress);
+            SystemIO.printString(line);
+        }
         RegisterFile.setProgramCounter(targetAddress);
     }
 

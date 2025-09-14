@@ -114,6 +114,7 @@ public class Launch {
     private boolean simulate;
     private boolean rv64;
     private boolean outputLog;
+    private boolean outputLogPC;
     private int displayFormat;
     private boolean verbose;  // display register name or address along with contents
     private boolean assembleProject; // assemble only the given file or all files in its directory
@@ -296,6 +297,10 @@ public class Launch {
                 outputLog = true;
                 continue;
             }
+            if (args[i].toLowerCase().equals("lgpc")) {
+                outputLogPC = true;
+                continue;
+            }
             if (args[i].toLowerCase().equals("dump")) {
                 if (args.length <= (i + 3)) {
                     out.println("Dump command line argument requires a segment, format and file name.");
@@ -461,6 +466,7 @@ public class Launch {
 
         Globals.getSettings().setBooleanSettingNonPersistent(Settings.Bool.RV64_ENABLED,rv64);
         Globals.getSettings().setBooleanSettingNonPersistent(Settings.Bool.OUTPUT_CO_LOGS, outputLog);
+        Globals.getSettings().setBooleanSettingNonPersistent(Settings.Bool.OUTPUT_CO_LOGS_PC, outputLogPC);
         InstructionSet.rv64 = rv64;
         Globals.instructionSet.populate();
 
