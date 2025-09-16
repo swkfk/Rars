@@ -133,6 +133,26 @@ public class MemoryConfigurations {
             0x00007fff  // memory map limit address
     };
 
+    // Compact allows 16 bit addressing, data segment starts at 0, with double(?)-spaced text
+    private static int[] longTextCompactConfigurationItemValues = {
+        0x00003000, // .text Base Address
+        0x00000000, // Data Segment base address
+        0x00001000, // .extern Base Address
+        0x00001800, // Global Pointer $gp)
+        0x00000000, // .data base Address
+        0x00002000, // heap base address
+        0x00002ffc, // stack pointer $sp
+        0x00002ffc, // stack base address
+        0x0000ffff, // highest address in user space
+        0x00004000, // lowest address in kernel space
+        0x00007f00, // MMIO base address
+        0xffffffff, // highest address in kernel (and memory)
+        0x00002fff, // data segment limit address
+        0x0000fffc, // text limit address
+        0x00002000, // stack limit address
+        0xffffffff  // memory map limit address
+    };
+
 
     public MemoryConfigurations() {
 
@@ -145,6 +165,7 @@ public class MemoryConfigurations {
             configurations.add(new MemoryConfiguration("Default", "Default", configurationItemNames, defaultConfigurationItemValues));
             configurations.add(new MemoryConfiguration("CompactDataAtZero", "Compact, Data at Address 0", configurationItemNames, dataBasedCompactConfigurationItemValues));
             configurations.add(new MemoryConfiguration("CompactTextAtZero", "Compact, Text at Address 0", configurationItemNames, textBasedCompactConfigurationItemValues));
+            configurations.add(new MemoryConfiguration("LongText", "Compact, Data at Address 0, Long Text", configurationItemNames, longTextCompactConfigurationItemValues));
             defaultConfiguration = configurations.get(0);
             currentConfiguration = defaultConfiguration;
             // Get current config from settings

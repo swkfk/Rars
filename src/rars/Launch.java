@@ -153,8 +153,11 @@ public class Launch {
         registerDisplayList = new ArrayList<>();
         memoryDisplayList = new ArrayList<>();
         filenameList = new ArrayList<>();
-        MemoryConfigurations.setCurrentConfiguration(MemoryConfigurations.getDefaultConfiguration());
         out = System.out;
+
+        if (!gui) {
+            MemoryConfigurations.setCurrentConfiguration(MemoryConfigurations.getDefaultConfiguration());
+        }
 
         if (!parseCommandArgs(args)) {
             System.exit(Globals.exitCode);
